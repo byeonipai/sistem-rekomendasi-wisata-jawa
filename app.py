@@ -38,7 +38,7 @@ st.markdown("""
     --shadow-strong: 0 8px 24px rgba(37,99,235,0.08);
 }
 
-/* Fallback dark mode */
+/* Dark mode fallback */
 @media (prefers-color-scheme: dark) {
     :root {
         --app-bg: #0e1117;
@@ -46,7 +46,7 @@ st.markdown("""
         --surface-soft: #151924;
         --border-color: #2a3140;
         --text-color: #f3f4f6;
-        --text-muted: #cbd5e1;
+        --text-muted: #94a3b8;
         --primary: #60a5fa;
         --primary-soft: #172554;
         --primary-border: #1d4ed8;
@@ -59,14 +59,21 @@ st.markdown("""
     }
 }
 
-html, body, [data-testid="stAppViewContainer"], .main {
-    color: var(--text-color);
+/* area utama */
+html, body, [data-testid="stAppViewContainer"], .main, .stApp {
+    background: var(--app-bg) !important;
+    color: var(--text-color) !important;
 }
 
 .block-container {
     padding-top: 1rem;
     padding-bottom: 2rem;
     max-width: 1400px;
+}
+
+/* teks umum */
+h1, h2, h3, h4, h5, h6, p, span, label, div {
+    color: var(--text-color);
 }
 
 .section-title {
@@ -78,10 +85,11 @@ html, body, [data-testid="stAppViewContainer"], .main {
 }
 
 .small-muted {
-    color: var(--text-muted);
+    color: var(--text-muted) !important;
     font-size: 0.92rem;
 }
 
+/* card custom */
 .card {
     background: var(--surface-bg);
     border: 1px solid var(--border-color);
@@ -225,10 +233,16 @@ html, body, [data-testid="stAppViewContainer"], .main {
     margin-bottom: 8px;
 }
 
+/* sidebar */
 [data-testid="stSidebar"] {
-    background: var(--surface-soft);
+    background: var(--surface-soft) !important;
 }
 
+[data-testid="stSidebar"] * {
+    color: var(--text-color) !important;
+}
+
+/* metric */
 div[data-testid="metric-container"] {
     background: var(--surface-bg);
     border: 1px solid var(--border-color);
@@ -238,13 +252,83 @@ div[data-testid="metric-container"] {
     color: var(--text-color);
 }
 
-/* paksa teks dalam container custom ikut warna yang aman */
-.card *, .detail-panel *, .list-item *, .location-panel *, .info-box * {
-    color: inherit;
+/* input, selectbox, multiselect, text input */
+.stTextInput input,
+.stNumberInput input,
+.stTextArea textarea,
+.stDateInput input,
+.stTimeInput input,
+div[data-baseweb="select"] > div,
+div[data-baseweb="input"] > div {
+    background-color: var(--surface-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
 }
 
+/* dropdown text */
+div[data-baseweb="select"] span,
+div[data-baseweb="select"] div {
+    color: var(--text-color) !important;
+}
+
+/* button */
+.stButton > button {
+    background: var(--primary) !important;
+    color: white !important;
+    border: none !important;
+}
+
+.stButton > button:hover {
+    filter: brightness(1.05);
+}
+
+/* radio, checkbox, slider labels */
+.stRadio label,
+.stCheckbox label,
+.stSlider label,
+label[data-testid="stWidgetLabel"] {
+    color: var(--text-color) !important;
+}
+
+/* tabs */
+button[data-baseweb="tab"] {
+    color: var(--text-muted) !important;
+}
+
+button[data-baseweb="tab"][aria-selected="true"] {
+    color: var(--text-color) !important;
+    font-weight: 700 !important;
+}
+
+/* dataframe / table */
+[data-testid="stDataFrame"],
+[data-testid="stTable"] {
+    color: var(--text-color) !important;
+}
+
+[data-testid="stDataFrame"] div,
+[data-testid="stTable"] div,
+table, thead, tbody, tr, td, th {
+    color: var(--text-color) !important;
+    background-color: transparent !important;
+}
+
+/* alert boxes */
+[data-testid="stInfo"],
+[data-testid="stSuccess"],
+[data-testid="stWarning"],
+[data-testid="stAlert"] {
+    color: var(--text-color) !important;
+}
+
+/* caption */
 [data-testid="stCaptionContainer"] {
     color: var(--text-muted) !important;
+}
+
+/* markdown dalam custom container */
+.card *, .detail-panel *, .list-item *, .location-panel *, .info-box * {
+    color: inherit !important;
 }
 </style>
 """, unsafe_allow_html=True)
