@@ -16,133 +16,190 @@ st.set_page_config(
 )
 
 # =========================================================
-# CUSTOM CSS
+# CUSTOM CSS - LIGHT/DARK MODE FRIENDLY
 # =========================================================
 st.markdown("""
 <style>
-.main {
-    padding-top: 0.8rem;
+:root {
+    --app-bg: #ffffff;
+    --surface-bg: #ffffff;
+    --surface-soft: #f8fafc;
+    --border-color: #e5e7eb;
+    --text-color: #111827;
+    --text-muted: #6b7280;
+    --primary: #2563eb;
+    --primary-soft: #eff6ff;
+    --primary-border: #dbeafe;
+    --success-soft: #ecfdf5;
+    --success-text: #047857;
+    --warning-soft: #fffbeb;
+    --warning-text: #b45309;
+    --shadow-soft: 0 6px 18px rgba(0,0,0,0.06);
+    --shadow-strong: 0 8px 24px rgba(37,99,235,0.08);
 }
+
+/* Fallback dark mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --app-bg: #0e1117;
+        --surface-bg: #1a1f2b;
+        --surface-soft: #151924;
+        --border-color: #2a3140;
+        --text-color: #f3f4f6;
+        --text-muted: #cbd5e1;
+        --primary: #60a5fa;
+        --primary-soft: #172554;
+        --primary-border: #1d4ed8;
+        --success-soft: #052e24;
+        --success-text: #6ee7b7;
+        --warning-soft: #3b2a05;
+        --warning-text: #fcd34d;
+        --shadow-soft: 0 6px 18px rgba(0,0,0,0.35);
+        --shadow-strong: 0 8px 24px rgba(0,0,0,0.35);
+    }
+}
+
+html, body, [data-testid="stAppViewContainer"], .main {
+    color: var(--text-color);
+}
+
 .block-container {
     padding-top: 1rem;
     padding-bottom: 2rem;
     max-width: 1400px;
 }
+
 .section-title {
     font-size: 1.18rem;
     font-weight: 800;
     margin-top: 0.4rem;
     margin-bottom: 0.9rem;
-    color: #111827;
+    color: var(--text-color);
 }
+
 .small-muted {
-    color: #6b7280;
+    color: var(--text-muted);
     font-size: 0.92rem;
 }
 
 .card {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 14px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    box-shadow: var(--shadow-soft);
     margin-bottom: 16px;
     transition: all 0.2s ease;
+    color: var(--text-color);
 }
+
 .card-selected {
-    border: 2px solid #2563eb !important;
-    box-shadow: 0 10px 24px rgba(37,99,235,0.12);
-    background: #f8fbff;
+    border: 2px solid var(--primary) !important;
+    box-shadow: var(--shadow-strong);
 }
+
 .card-title-text {
     font-size: 1rem;
     font-weight: 800;
-    color: #111827;
+    color: var(--text-color);
     margin-bottom: 8px;
     line-height: 1.4;
 }
+
 .card-score {
     display: inline-block;
-    background: #eff6ff;
-    color: #1d4ed8;
+    background: var(--primary-soft);
+    color: var(--primary);
     border-radius: 999px;
     padding: 6px 12px;
     font-size: 0.82rem;
     font-weight: 700;
     margin-top: 8px;
 }
+
 .img-square {
     width: 100%;
     aspect-ratio: 1 / 1;
     object-fit: cover;
     border-radius: 16px;
     display: block;
-    border: 1px solid #e5e7eb;
-    background: #f3f4f6;
+    border: 1px solid var(--border-color);
+    background: var(--surface-soft);
     margin-bottom: 10px;
 }
 
 .detail-panel {
-    background: white;
-    border: 1px solid #dbeafe;
+    background: var(--surface-bg);
+    border: 1px solid var(--primary-border);
     border-radius: 22px;
     padding: 18px;
-    box-shadow: 0 8px 24px rgba(37,99,235,0.08);
+    box-shadow: var(--shadow-strong);
     margin-bottom: 18px;
+    color: var(--text-color);
 }
+
 .detail-title {
     font-size: 1.4rem;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--text-color);
     margin-bottom: 8px;
 }
+
 .badge {
     display: inline-block;
-    background: #f3f4f6;
-    color: #111827;
+    background: var(--surface-soft);
+    color: var(--text-color);
     border-radius: 999px;
     padding: 6px 10px;
     font-size: 0.8rem;
     font-weight: 600;
     margin-right: 6px;
     margin-bottom: 6px;
+    border: 1px solid var(--border-color);
 }
+
 .badge-blue {
-    background: #eff6ff;
-    color: #1d4ed8;
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-color: var(--primary-border);
 }
+
 .badge-green {
-    background: #ecfdf5;
-    color: #047857;
+    background: var(--success-soft);
+    color: var(--success-text);
 }
+
 .badge-yellow {
-    background: #fffbeb;
-    color: #b45309;
+    background: var(--warning-soft);
+    color: var(--warning-text);
 }
+
 .badge-gray {
-    background: #f3f4f6;
-    color: #374151;
+    background: var(--surface-soft);
+    color: var(--text-color);
 }
 
 .info-box {
-    background: #f8fafc;
-    border: 1px solid #e5e7eb;
+    background: var(--surface-soft);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 12px 14px;
     margin-bottom: 10px;
+    color: var(--text-color);
 }
 
 .list-item {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
     border-radius: 18px;
     padding: 12px;
     margin-bottom: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    box-shadow: var(--shadow-soft);
+    color: var(--text-color);
 }
+
 .list-item-selected {
-    border: 2px solid #2563eb !important;
-    background: #f8fbff;
+    border: 2px solid var(--primary) !important;
 }
 
 .detail-btn > div button {
@@ -152,29 +209,42 @@ st.markdown("""
 }
 
 .location-panel {
-    background: #f8fbff;
-    border: 1px solid #dbeafe;
+    background: var(--surface-soft);
+    border: 1px solid var(--primary-border);
     border-radius: 18px;
     padding: 16px;
     margin-top: 10px;
     margin-bottom: 16px;
+    color: var(--text-color);
 }
+
 .location-title {
     font-size: 1rem;
     font-weight: 800;
-    color: #1e3a8a;
+    color: var(--primary);
     margin-bottom: 8px;
 }
 
 [data-testid="stSidebar"] {
-    background: #f8fafc;
+    background: var(--surface-soft);
 }
+
 div[data-testid="metric-container"] {
-    background: white;
-    border: 1px solid #e5e7eb;
+    background: var(--surface-bg);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 12px 14px;
     box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+    color: var(--text-color);
+}
+
+/* paksa teks dalam container custom ikut warna yang aman */
+.card *, .detail-panel *, .list-item *, .location-panel *, .info-box * {
+    color: inherit;
+}
+
+[data-testid="stCaptionContainer"] {
+    color: var(--text-muted) !important;
 }
 </style>
 """, unsafe_allow_html=True)
