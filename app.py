@@ -54,10 +54,12 @@ st.markdown("""
     box-shadow: 0 10px 24px rgba(37,99,235,0.12);
     background: #f8fbff;
 }
-.card-meta {
-    font-size: 0.9rem;
-    color: #4b5563;
-    margin-bottom: 4px;
+.card-title-text {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 8px;
+    line-height: 1.4;
 }
 .card-score {
     display: inline-block;
@@ -143,26 +145,25 @@ st.markdown("""
     background: #f8fbff;
 }
 
-.nama-btn > div button {
-    background: none !important;
-    border: none !important;
-    padding: 0 !important;
-    color: #1d4ed8 !important;
-    font-size: 1rem !important;
-    font-weight: 800 !important;
-    text-align: left !important;
-    justify-content: flex-start !important;
-    min-height: auto !important;
-}
-.nama-btn > div button:hover {
-    color: #1e40af !important;
-    text-decoration: underline !important;
-}
-
 .detail-btn > div button {
     width: 100% !important;
     border-radius: 12px !important;
     font-weight: 700 !important;
+}
+
+.location-panel {
+    background: #f8fbff;
+    border: 1px solid #dbeafe;
+    border-radius: 18px;
+    padding: 16px;
+    margin-top: 10px;
+    margin-bottom: 16px;
+}
+.location-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1e3a8a;
+    margin-bottom: 8px;
 }
 
 [data-testid="stSidebar"] {
@@ -191,6 +192,12 @@ if "selected_wisata" not in st.session_state:
     st.session_state.selected_wisata = None
 if "view_mode" not in st.session_state:
     st.session_state.view_mode = "Grid"
+if "use_location" not in st.session_state:
+    st.session_state.use_location = False
+if "radius" not in st.session_state:
+    st.session_state.radius = 20
+if "last_toast_coords" not in st.session_state:
+    st.session_state.last_toast_coords = None
 
 # =========================================================
 # HELPER FUNCTIONS
@@ -277,15 +284,10 @@ def render_recommendation_card(row, use_location=False, key_suffix=""):
             unsafe_allow_html=True
         )
 
-        st.markdown("<div class='nama-btn'>", unsafe_allow_html=True)
-        if st.button(
-            f"{row['nama wisata']}",
-            key=f"nama_card_{key_suffix}",
-            use_container_width=True
-        ):
-            pilih_wisata(row)
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='card-title-text'>{row['nama wisata']}</div>",
+            unsafe_allow_html=True
+        )
 
         st.markdown(render_badges(row, use_location), unsafe_allow_html=True)
         st.markdown(render_score_badge(row), unsafe_allow_html=True)
@@ -309,28 +311,17 @@ def render_recommendation_list_item(row, use_location=False, key_suffix=""):
         st.image(img_src, use_container_width=True)
 
     with c2:
-        st.markdown("<div class='nama-btn'>", unsafe_allow_html=True)
-        if st.button(
-            f"{row['nama wisata']}",
-            key=f"nama_list_{key_suffix}",
-            use_container_width=True
-        ):
-            pilih_wisata(row)
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='card-title-text'>{row['nama wisata']}</div>",
+            unsafe_allow_html=True
+        )
 
         st.markdown(render_badges(row, use_location), unsafe_allow_html=True)
         st.markdown(render_score_badge(row), unsafe_allow_html=True)
 
-        col_btn1, col_btn2 = st.columns(2)
-        with col_btn1:
-            if st.button("Lihat Detail", key=f"detail_list_{key_suffix}", use_container_width=True):
-                pilih_wisata(row)
-                st.rerun()
-        with col_btn2:
-            if st.button("Pilih", key=f"pilih_list_{key_suffix}", use_container_width=True):
-                pilih_wisata(row)
-                st.rerun()
+        if st.button("Lihat Detail", key=f"detail_list_{key_suffix}", use_container_width=True):
+            pilih_wisata(row)
+            st.rerun()
 
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -594,7 +585,7 @@ m3.metric("Total Kategori", df["KATEGORI"].nunique())
 # PETA EKSPLORASI AWAL
 # =========================================================
 st.markdown("<div class='section-title'>Persebaran Semua Destinasi Wisata</div>", unsafe_allow_html=True)
-st.markdown("<div class='small-muted'>Klik peta untuk menentukan titik lokasi aktif. Lokasi ini bisa dipakai saat mencari rekomendasi berbasis jarak.</div>", unsafe_allow_html=True)
+st.markdown("<div class='small-muted'>Klik peta untuk memilih titik lokasi pengguna. Setelah itu aktifkan opsi penggunaan lokasi di panel bawah peta.</div>", unsafe_allow_html=True)
 
 col_map, col_stats = st.columns([2.2, 1])
 
@@ -647,12 +638,49 @@ with col_stats:
     st.caption("Menampilkan kota dengan jumlah destinasi terbanyak.")
 
 if map_awal and map_awal.get("last_clicked"):
-    st.session_state.clicked_lat = map_awal["last_clicked"]["lat"]
-    st.session_state.clicked_lon = map_awal["last_clicked"]["lng"]
+    new_lat = map_awal["last_clicked"]["lat"]
+    new_lon = map_awal["last_clicked"]["lng"]
+    new_coords = (round(new_lat, 6), round(new_lon, 6))
 
-st.success(
-    f"Titik aktif saat ini: {st.session_state.clicked_lat:.6f}, {st.session_state.clicked_lon:.6f}"
-)
+    st.session_state.clicked_lat = new_lat
+    st.session_state.clicked_lon = new_lon
+
+    if st.session_state.last_toast_coords != new_coords:
+        st.toast("Titik aktif diperbarui dari peta 📍")
+        st.session_state.last_toast_coords = new_coords
+
+st.markdown("<div class='location-panel'>", unsafe_allow_html=True)
+st.markdown("<div class='location-title'>Pengaturan Lokasi Pengguna</div>", unsafe_allow_html=True)
+
+loc1, loc2 = st.columns([1.3, 1])
+
+with loc1:
+    st.info(
+        f"Titik aktif saat ini: {st.session_state.clicked_lat:.6f}, {st.session_state.clicked_lon:.6f}"
+    )
+    st.caption("Klik peta di atas untuk mengganti titik lokasi pengguna.")
+
+with loc2:
+    st.session_state.use_location = st.checkbox(
+        "Gunakan titik yang dipilih di peta",
+        value=st.session_state.use_location
+    )
+
+    if st.session_state.use_location:
+        st.session_state.radius = st.slider(
+            "Radius pencarian (km)",
+            1,
+            100,
+            max(1, int(st.session_state.radius if st.session_state.radius > 0 else 20))
+        )
+        st.caption("Rekomendasi akan difilter berdasarkan jarak dari titik aktif.")
+    else:
+        st.caption("Lokasi belum digunakan dalam proses rekomendasi.")
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+use_location = st.session_state.use_location
+radius = st.session_state.radius if st.session_state.use_location else 0
 
 st.markdown("---")
 
@@ -681,16 +709,6 @@ with col_sidebar:
 
     budget = st.slider("Budget Maksimal", 0, 500000, 200000, 10000)
     rating = st.slider("Rating Minimum", 1.0, 5.0, 4.0, 0.1)
-
-    st.markdown("---")
-    use_location = st.checkbox("Gunakan titik aktif sebagai lokasi user", value=False)
-
-    if use_location:
-        radius = st.slider("Radius pencarian (km)", 1, 100, 20)
-        st.caption("Lokasi diambil dari klik pada peta persebaran.")
-    else:
-        radius = 0
-
     jumlah = st.slider("Jumlah rekomendasi", 3, 12, 6)
 
     view_mode = st.radio("Mode Tampilan Hasil", ["Grid", "List"], horizontal=True)
@@ -778,7 +796,7 @@ with col_main:
             c.metric("Skor Tertinggi", f"{hasil['final_score'].max():.2f}")
 
             st.markdown(
-                "<div class='small-muted'>Klik nama wisata atau tombol <b>Lihat Detail</b> untuk membuka informasi lengkap destinasi.</div>",
+                "<div class='small-muted'>Klik tombol <b>Lihat Detail</b> untuk membuka informasi lengkap destinasi.</div>",
                 unsafe_allow_html=True
             )
 
